@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
+django-environ = "*"
 
 [dev-packages]
 black = "*"
@@ -13,6 +14,7 @@ jupyter = "*"
 django-extensions = "*"
 requests = "*"
 beautifulsoup4 = "*"
+lxml = "*"
 
 [requires]
 python_version = "3.10"
