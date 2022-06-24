@@ -36,7 +36,7 @@ class Species(models.Model):
     genus = models.ForeignKey(
         "taxonomy.Genus", on_delete=models.CASCADE, verbose_name="속"
     )
-    scientific_name = models.CharField(verbose_name="학명", max_length=100, unique=True)
+    scientific_name = models.CharField(verbose_name="학명", max_length=200, unique=True)
     name_kor = models.CharField(
         verbose_name="국명", max_length=100, blank=True, null=True
     )
