@@ -27,6 +27,7 @@ class SpeciesAdmin(admin.ModelAdmin):
         "name_kor",
         "family",
         "scientific_name",
+        "pid",
     ]
     search_fields = ["genus__name", "name_kor", "scientific_name"]
     ordering = ["name_kor"]

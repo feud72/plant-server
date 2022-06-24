@@ -40,6 +40,9 @@ class Species(models.Model):
     name_kor = models.CharField(
         verbose_name="국명", max_length=100, blank=True, null=True
     )
+    pid = models.CharField(
+        verbose_name="국립수목원도감번호", max_length=10, blank=True, null=True
+    )
 
     class Meta:
         verbose_name = "Species"
