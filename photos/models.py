@@ -1,6 +1,6 @@
 from django.db import models
 
-from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Photo(models.Model):
@@ -13,7 +13,9 @@ class Photo(models.Model):
         WHOLE = 5
         NOT_A_PLANT = 9
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True
+    )
     plant = models.ForeignKey(
         "taxonomy.Species", on_delete=models.CASCADE, blank=True, null=True
     )

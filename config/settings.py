@@ -56,6 +56,7 @@ if DEBUG:
 USER_APPS = [
     "taxonomy",
     "photos",
+    "core",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + USER_APPS
@@ -178,3 +179,5 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
 }
+
+AUTH_USER_MODEL = "core.User"
