@@ -17,6 +17,7 @@ django-extensions = "*"
 requests = "*"
 beautifulsoup4 = "*"
 lxml = "*"
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.10"

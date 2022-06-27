@@ -26,7 +26,7 @@ ENV = Env()
 SECRET_KEY = ENV.ENV("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = ENV.ENV.bool("IS_DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -44,8 +44,14 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
-    "django_extensions",
 ]
+
+if DEBUG:
+    THIRD_PARTY_APPS += [
+        "django_extensions",
+        "debug_toolbar",
+    ]
+
 
 USER_APPS = [
     "taxonomy",
@@ -63,6 +69,17 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+
+if DEBUG:
+    MIDDLEWARE += [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
+    STATIC_ROOT = Path.joinpath(BASE_DIR, "static")
+
 
 ROOT_URLCONF = "config.urls"
 

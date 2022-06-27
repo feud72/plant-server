@@ -177,3 +177,5 @@ cython_debug/
 assets/plants_description/*
 assets/plants_list/*
 assets/images/*
+
+static/*
