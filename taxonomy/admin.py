@@ -26,10 +26,10 @@ class SpeciesAdmin(admin.ModelAdmin):
     list_display = [
         "name_kor",
         "family",
-        "scientific_name",
+        "name",
         "pid",
     ]
-    search_fields = ["genus__name", "name_kor", "scientific_name"]
+    search_fields = ["genus__name", "name_kor", "name"]
     ordering = ["name_kor"]
 
     @admin.display(description="과")

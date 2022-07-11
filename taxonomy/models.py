@@ -10,6 +10,7 @@ class Family(models.Model):
     class Meta:
         verbose_name = "Family"
         verbose_name_plural = "과"
+        ordering = ["name_kor"]
 
     def __str__(self) -> str:
         return self.name_kor
@@ -36,17 +37,15 @@ class Species(models.Model):
     genus = models.ForeignKey(
         "taxonomy.Genus", on_delete=models.CASCADE, verbose_name="속"
     )
-    scientific_name = models.CharField(verbose_name="학명", max_length=200, unique=True)
+    name = models.CharField(verbose_name="학명", max_length=200, unique=True)
     name_kor = models.CharField(
         verbose_name="국명", max_length=100, blank=True, null=True
     )
-    pid = models.CharField(
-        verbose_name="국립수목원도감번호", max_length=10, blank=True, null=True
-    )
+    pid = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = "Species"
         verbose_name_plural = "종"
 
     def __str__(self) -> str:
-        return self.scientific_name
+        return self.name
