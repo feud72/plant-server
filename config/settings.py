@@ -28,8 +28,6 @@ SECRET_KEY = ENV.ENV("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = ENV.ENV.bool("IS_DEBUG")
 
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -44,6 +42,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "django_filters",
 ]
 
 if DEBUG:
@@ -73,6 +72,7 @@ MIDDLEWARE = [
 
 
 if DEBUG:
+    ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1"]
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]

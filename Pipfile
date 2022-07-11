@@ -9,6 +9,7 @@ djangorestframework = "*"
 django-environ = "*"
 pillow = "*"
 mysqlclient = "*"
+django-filter = "*"
 
 [dev-packages]
 black = "*"
