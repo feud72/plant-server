@@ -1,6 +1,10 @@
+import uuid
+from django.utils import timezone
 from django.db import models
 
-from django.conf import settings
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Photo(models.Model):
@@ -13,14 +17,57 @@ class Photo(models.Model):
         WHOLE = 5
         NOT_A_PLANT = 9
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True
+    def create_uuid_filename(self, filename, thumbnail=False):
+        suffix = filename.split(".")[-1]
+        seed = str(self.uploaded_at.timestamp())
+        name = uuid.uuid3(uuid.NAMESPACE_DNS, seed)
+        if thumbnail:
+            name = f"{name}_thumbnail"
+        return f"{name}.{suffix}"
+
+    def upload_to(self, filename):
+        base_path = "images"
+        year_month = timezone.now().strftime("%Y%m")
+        filename = self.create_uuid_filename(filename)
+        path = "/".join([base_path, year_month, filename])
+        return path
+
+    def upload_to_thumbnails(self, filename):
+        filename = self.create_uuid_filename(filename, thumbnail=True)
+        return f"thumbnails/{filename}"
+
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="photos",
     )
-    plant = models.ForeignKey(
-        "taxonomy.Species", on_delete=models.CASCADE, blank=True, null=True
+    family = models.ForeignKey(
+        "taxonomy.Family",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="photos",
     )
-    url = models.URLField()
-    thumbnail = models.URLField()
+    genus = models.ForeignKey(
+        "taxonomy.Genus",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="photos",
+    )
+    species = models.ForeignKey(
+        "taxonomy.Species",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="photos",
+    )
+    url = models.ImageField(upload_to=upload_to, max_length=255, blank=True, null=True)
+    thumbnail = models.ImageField(
+        upload_to=upload_to_thumbnails, max_length=255, blank=True, null=True
+    )
     part = models.IntegerField(choices=Part.choices, default=0)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     upvote = models.IntegerField(default=0)
@@ -35,5 +82,16 @@ class Photo(models.Model):
     is_peer_reviewed = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["-uploaded_at"]
+
     def __str__(self) -> str:
-        return self.plant.name_kor
+        if self.plant:
+            if self.plant.name_kor:
+                return self.plant.name_kor
+            elif self.plant.name:
+                return self.plant.name
+        return f"미분류 #{str(self.id)}"
+
+    def delete(self, *args, **kwargs):
+        super().save(*args, **kwargs)
