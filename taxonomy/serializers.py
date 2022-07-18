@@ -2,20 +2,10 @@ from rest_framework import serializers
 
 from .models import Family, Genus, Species
 
-
-class SpeciesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Species
-        fields = ("id", "name", "name_kor", "pid", "genus")
+from photos.serializers import PhotoTaxonomyRelatedSerializer
 
 
-class GenusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genus
-        fields = ("id", "family", "name", "name_kor")
-
-
-class FamilySerializer(serializers.ModelSerializer):
+class FamilySmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Family
         fields = ("id", "name", "name_kor")
@@ -33,6 +23,44 @@ class SpeciesSmallSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "name_kor")
 
 
+class GenusSerializer(serializers.ModelSerializer):
+    children = SpeciesSmallSerializer(source="species_set", read_only=True, many=True)
+    photos = PhotoTaxonomyRelatedSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Genus
+        fields = ("id", "name", "name_kor", "photos", "children")
+
+
+class FamilySerializer(serializers.ModelSerializer):
+    children = GenusSmallSerializer(source="genus_set", many=True, read_only=True)
+    # image = serializers.URLField(read_only=True)
+    photos = PhotoTaxonomyRelatedSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Family
+        fields = ("id", "name", "name_kor", "photos", "children")
+
+
+class SpeciesSerializer(serializers.ModelSerializer):
+    genus = GenusSmallSerializer(read_only=True)
+    family = FamilySmallSerializer(source="genus.family", read_only=True)
+    photos = PhotoTaxonomyRelatedSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    class Meta:
+        model = Species
+        fields = ("id", "name", "name_kor", "genus", "family", "photos")
+
+
 class FamilyDetailSerializer(FamilySerializer):
     genera = GenusSmallSerializer(source="genus_set", many=True, read_only=True)
 
@@ -40,16 +68,8 @@ class FamilyDetailSerializer(FamilySerializer):
         fields = ("id", "name", "name_kor", "genera")
 
 
-class SpeciesDetailSerializer(SpeciesSerializer):
-    genus = GenusSerializer(read_only=True)
-    family = FamilySerializer(source="genus.family", read_only=True)
-
-    class Meta(SpeciesSerializer.Meta):
-        fields = ("id", "name", "name_kor", "family", "genus")
-
-
 class GenusDetailSerializer(GenusSerializer):
-    species = SpeciesSmallSerializer(source="species_set", many=True, read_only=True)
+    species = SpeciesSerializer(source="species_set", many=True, read_only=True)
     family = FamilySerializer(read_only=True)
 
     class Meta(GenusSerializer.Meta):

@@ -1,13 +1,11 @@
+from django.db.models import F
 from rest_framework.viewsets import ModelViewSet
 from django_filters import rest_framework as filters
 
 from .models import Family, Genus, Species
 from .serializers import (
     FamilySerializer,
-    FamilyDetailSerializer,
     GenusSerializer,
-    GenusDetailSerializer,
-    SpeciesDetailSerializer,
     SpeciesSerializer,
 )
 
@@ -15,44 +13,47 @@ from core.filters import FamilyFilter, GenusFilter, SpeciesFilter
 
 
 class FamilyViewSet(ModelViewSet):
-    queryset = Family.objects.all()
-    serializer_class = {
-        "list": FamilySerializer,
-        "retrieve": FamilyDetailSerializer,
-    }
-    default_serializer_class = FamilySerializer
+    queryset = (
+        Family.objects.all().prefetch_related("genus_set").prefetch_related("photos")
+    )
+    serializer_class = FamilySerializer
     http_method_names = ["get"]
     pagination_class = None
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = FamilyFilter
 
-    def get_serializer_class(self):
-        return self.serializer_class.get(self.action, self.default_serializer_class)
-
 
 class GenusViewSet(ModelViewSet):
-    queryset = Genus.objects.all()
-    serializer_class = {
-        "list": GenusSerializer,
-        "retrieve": GenusDetailSerializer,
-    }
-    default_serializer_class = GenusSerializer
+    queryset = (
+        Genus.objects.all().prefetch_related("species_set").prefetch_related("photos")
+    )
+    serializer_class = GenusSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = GenusFilter
 
-    def get_serializer_class(self):
-        return self.serializer_class.get(self.action, self.default_serializer_class)
+
+class FamilyRelatedGenusViewSet(ModelViewSet):
+    serializer_class = GenusSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = GenusFilter
+    pagination_class = None
+
+    def get_queryset(self):
+        return (
+            Genus.objects.filter(family=self.kwargs["family_pk"])
+            .prefetch_related("species_set")
+            .prefetch_related("photos")
+            .order_by(F("name_kor").asc(nulls_last=True))
+        )
 
 
 class SpeciesViewSet(ModelViewSet):
-    queryset = Species.objects.all()
-    serializer_class = {
-        "list": SpeciesSerializer,
-        "retrieve": SpeciesDetailSerializer,
-    }
-    default_serializer_class = SpeciesSerializer
+    queryset = (
+        Species.objects.all()
+        .select_related("genus")
+        .select_related("genus__family")
+        .prefetch_related("photos")
+    )
+    serializer_class = SpeciesSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = SpeciesFilter
-
-    def get_serializer_class(self):
-        return self.serializer_class.get(self.action, self.default_serializer_class)

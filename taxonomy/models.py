@@ -1,4 +1,8 @@
 from django.db import models
+from django.conf import settings
+from django.utils.functional import cached_property
+
+from photos.models import Photo
 
 
 class Family(models.Model):
@@ -15,6 +19,12 @@ class Family(models.Model):
     def __str__(self) -> str:
         return self.name_kor
 
+    @property
+    def image(self):
+        photo = Photo.objects.filter(family=self.id).first().thumbnail
+
+        return f"{settings.MEDIA_URL}{photo}"
+
 
 class Genus(models.Model):
     family = models.ForeignKey(
@@ -28,9 +38,15 @@ class Genus(models.Model):
     class Meta:
         verbose_name = "Genus"
         verbose_name_plural = "속"
+        ordering = ["name_kor"]
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def image(self):
+        photo = Photo.objects.filter(genus=self.id).first().thumbnail
+        return f"{settings.MEDIA_URL}{photo}"
 
 
 class Species(models.Model):
