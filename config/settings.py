@@ -42,7 +42,9 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "storages",
     "django_filters",
+    "corsheaders",
 ]
 
 if DEBUG:
@@ -61,6 +63,7 @@ USER_APPS = [
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + USER_APPS
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -72,12 +75,13 @@ MIDDLEWARE = [
 
 
 if DEBUG:
-    ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1"]
+    ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1", "localhost"]
     MIDDLEWARE += [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ]
     INTERNAL_IPS = [
         "127.0.0.1",
+        "localhost",
     ]
     STATIC_ROOT = Path.joinpath(BASE_DIR, "static")
 
@@ -163,7 +167,7 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -177,7 +181,26 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 50,
+    "PAGE_SIZE": 20,
 }
 
 AUTH_USER_MODEL = "core.User"
+
+DEFAULT_FILE_STORAGE = "core.storages.S3DefaultStorage"
+# STATICFILES_STORAGE = "core.storages.S3StaticStorage"
+
+AWS_ACCESS_KEY_ID = ENV.ENV("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = ENV.ENV("AWS_SECRET_ACCESS_KEY")
+AWS_DEFAULT_ACL = ENV.ENV("AWS_DEFAULT_ACL")
+AWS_S3_REGION_NAME = ENV.ENV("AWS_S3_REGION_NAME")
+AWS_S3_SIGNATURE_VERSION = ENV.ENV("AWS_S3_SIGNATURE_VERSION")
+AWS_STORAGE_BUCKET_NAME = ENV.ENV("AWS_STORAGE_BUCKET_NAME")
+AWS_CLOUDFRONT_DOMAIN = ENV.ENV("AWS_CLOUDFRONT_DOMAIN")
+
+MEDIA_URL = f"https://{AWS_CLOUDFRONT_DOMAIN}/"
+
+CORS_ALLOWED_ORIGIN = [
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+CORS_ALLOW_CREDENTIALS = True

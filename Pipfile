@@ -10,6 +10,10 @@ django-environ = "*"
 pillow = "*"
 mysqlclient = "*"
 django-filter = "*"
+django-storages = "*"
+boto3 = "*"
+django-cors-headers = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 black = "*"
