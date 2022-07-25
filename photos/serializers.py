@@ -6,7 +6,15 @@ from taxonomy.models import Genus, Species
 
 from .models import Photo
 
+from taxonomy.models import Family
+
 User = get_user_model()
+
+
+class FamilySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Family
+        fields = ("id", "name", "name_kor")
 
 
 class GenusSerializer(serializers.ModelSerializer):
@@ -29,6 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
+    family = FamilySerializer()
     genus = GenusSerializer()
     species = SpeciesSerializer()
     url = serializers.ImageField(use_url=True)
@@ -39,12 +48,15 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "owner",
+            "family",
             "genus",
             "species",
             "uploaded_at",
             "url",
             "thumbnail",
             "part",
+            "upvote",
+            "downvote",
             "longitude",
             "latitude",
             "place",
