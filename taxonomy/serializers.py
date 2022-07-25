@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from .models import Family, Genus, Species
 
-from photos.serializers import PhotoTaxonomyRelatedSerializer
+from photos.serializers import PhotoTaxonomyRelatedSerializer, PhotoSerializer
 
 
 class FamilySmallSerializer(serializers.ModelSerializer):
@@ -51,7 +51,7 @@ class FamilySerializer(serializers.ModelSerializer):
 class SpeciesSerializer(serializers.ModelSerializer):
     genus = GenusSmallSerializer(read_only=True)
     family = FamilySmallSerializer(source="genus.family", read_only=True)
-    photos = PhotoTaxonomyRelatedSerializer(
+    photos = PhotoSerializer(
         many=True,
         read_only=True,
     )

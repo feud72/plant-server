@@ -47,6 +47,19 @@ class FamilyRelatedGenusViewSet(ModelViewSet):
         )
 
 
+class RelatedSpeciesViewSet(ModelViewSet):
+    serializer_class = SpeciesSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    pagination_class = None
+
+    def get_queryset(self):
+        return (
+            Species.objects.filter(genus=self.kwargs["genera_pk"])
+            .prefetch_related("photos")
+            .order_by(F("name_kor").asc(nulls_last=True))
+        )
+
+
 class SpeciesViewSet(ModelViewSet):
     queryset = (
         Species.objects.all()
