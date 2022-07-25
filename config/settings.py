@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import pymysql
+
 from .env_controller import Env
 
 
@@ -73,6 +75,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+ALLOWED_HOSTS = [ENV.ENV("PRODUCT_HOST_IP")]
 
 if DEBUG:
     ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1", "localhost"]
@@ -83,7 +86,7 @@ if DEBUG:
         "127.0.0.1",
         "localhost",
     ]
-    STATIC_ROOT = Path.joinpath(BASE_DIR, "static")
+STATIC_ROOT = Path.joinpath(BASE_DIR, "static")
 
 
 ROOT_URLCONF = "config.urls"
@@ -120,6 +123,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 # }
 
 # DB로 MySQL을 사용하는 경우
+
+pymysql.install_as_MySQLdb()
 
 DATABASES = {
     "default": {
@@ -202,5 +207,6 @@ MEDIA_URL = f"https://{AWS_CLOUDFRONT_DOMAIN}/"
 CORS_ALLOWED_ORIGIN = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
+    ENV.ENV("PRODUCT_HOST_IP"),
 ]
 CORS_ALLOW_CREDENTIALS = True

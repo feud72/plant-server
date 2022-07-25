@@ -14,6 +14,7 @@ django-storages = "*"
 boto3 = "*"
 django-cors-headers = "*"
 drf-nested-routers = "*"
+pymysql = "*"
 
 [dev-packages]
 black = "*"
@@ -25,7 +26,7 @@ lxml = "*"
 django-debug-toolbar = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.7"
 
 [pipenv]
 allow_prereleases = true
