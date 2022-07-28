@@ -14,7 +14,7 @@ from core.filters import FamilyFilter, GenusFilter, SpeciesFilter
 
 class FamilyViewSet(ModelViewSet):
     queryset = (
-        Family.objects.all().prefetch_related("genus_set").prefetch_related("photos")
+        Family.objects.prefetch_related("genera").prefetch_related("photos").distinct()
     )
     serializer_class = FamilySerializer
     http_method_names = ["get"]
@@ -22,14 +22,39 @@ class FamilyViewSet(ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = FamilyFilter
 
+    def get_serializer_context(self):
+        context = {
+            "request": self.request,
+            "format": self.format_kwarg,
+            "view": self,
+        }
+        query = self.request.query_params.get("query")
+        if query != None:
+            context.update({"query": query})
+        return context
+
 
 class GenusViewSet(ModelViewSet):
     queryset = (
-        Genus.objects.all().prefetch_related("species_set").prefetch_related("photos")
+        Genus.objects.prefetch_related("species")
+        .prefetch_related("photos")
+        .distinct()
+        .order_by(F("name_kor").asc(nulls_last=True))
     )
     serializer_class = GenusSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = GenusFilter
+
+    def get_serializer_context(self):
+        context = {
+            "request": self.request,
+            "format": self.format_kwarg,
+            "view": self,
+        }
+        query = self.request.query_params.get("query")
+        if query != None:
+            context.update({"query": query})
+        return context
 
 
 class FamilyRelatedGenusViewSet(ModelViewSet):

@@ -73,3 +73,19 @@ class PhotoTaxonomyRelatedSerializer(serializers.ModelSerializer):
             "url",
             "thumbnail",
         )
+
+
+class FilteredThumbnailSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        # data = data.all().first()
+        return super(FilteredThumbnailSerializer, self).to_representation(data)
+
+
+class PhotoThumbnailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Photo
+        fields = (
+            "id",
+            "thumbnail",
+        )
+        list_serializer_class = FilteredThumbnailSerializer

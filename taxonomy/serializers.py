@@ -2,7 +2,25 @@ from rest_framework import serializers
 
 from .models import Family, Genus, Species
 
-from photos.serializers import PhotoTaxonomyRelatedSerializer, PhotoSerializer
+from photos.serializers import (
+    PhotoTaxonomyRelatedSerializer,
+    PhotoSerializer,
+    PhotoThumbnailSerializer,
+)
+
+
+class FilteredGenusSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        if "query" in self.context.keys():
+            data = data.filter(species__name_kor__icontains=self.context["query"])
+        return super(FilteredGenusSerializer, self).to_representation(data)
+
+
+class FilteredSpeciesSerializer(serializers.ListSerializer):
+    def to_representation(self, data):
+        if "query" in self.context.keys():
+            data = data.filter(name_kor__icontains=self.context["query"])
+        return super(FilteredSpeciesSerializer, self).to_representation(data)
 
 
 class FamilySmallSerializer(serializers.ModelSerializer):
@@ -15,16 +33,18 @@ class GenusSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genus
         fields = ("id", "name", "name_kor")
+        list_serializer_class = FilteredGenusSerializer
 
 
 class SpeciesSmallSerializer(serializers.ModelSerializer):
     class Meta:
         model = Species
         fields = ("id", "name", "name_kor")
+        list_serializer_class = FilteredSpeciesSerializer
 
 
 class GenusSerializer(serializers.ModelSerializer):
-    children = SpeciesSmallSerializer(source="species_set", read_only=True, many=True)
+    children = SpeciesSmallSerializer(source="species", read_only=True, many=True)
     photos = PhotoTaxonomyRelatedSerializer(
         many=True,
         read_only=True,
@@ -36,9 +56,9 @@ class GenusSerializer(serializers.ModelSerializer):
 
 
 class FamilySerializer(serializers.ModelSerializer):
-    children = GenusSmallSerializer(source="genus_set", many=True, read_only=True)
-    # image = serializers.URLField(read_only=True)
-    photos = PhotoTaxonomyRelatedSerializer(
+    children = GenusSmallSerializer(source="genera", many=True, read_only=True)
+    # photos = PhotoTaxonomyRelatedSerializer(
+    photos = PhotoThumbnailSerializer(
         many=True,
         read_only=True,
     )

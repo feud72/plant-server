@@ -10,7 +10,7 @@ from .views import (
 )
 
 router = routers.DefaultRouter()
-router.register("families", FamilyViewSet)
+router.register("families", FamilyViewSet, basename="family")
 router.register("genera", GenusViewSet)
 router.register("species", SpeciesViewSet)
 

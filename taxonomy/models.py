@@ -22,13 +22,15 @@ class Family(models.Model):
     @property
     def image(self):
         photo = Photo.objects.filter(family=self.id).first().thumbnail
-
         return f"{settings.MEDIA_URL}{photo}"
 
 
 class Genus(models.Model):
     family = models.ForeignKey(
-        "taxonomy.Family", on_delete=models.CASCADE, verbose_name="과"
+        "taxonomy.Family",
+        on_delete=models.CASCADE,
+        verbose_name="과",
+        related_name="genera",
     )
     name = models.CharField(verbose_name="속", max_length=100, unique=True)
     name_kor = models.CharField(
@@ -51,7 +53,10 @@ class Genus(models.Model):
 
 class Species(models.Model):
     genus = models.ForeignKey(
-        "taxonomy.Genus", on_delete=models.CASCADE, verbose_name="속"
+        "taxonomy.Genus",
+        on_delete=models.CASCADE,
+        verbose_name="속",
+        related_name="species",
     )
     name = models.CharField(verbose_name="학명", max_length=200, unique=True)
     name_kor = models.CharField(

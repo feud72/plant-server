@@ -179,8 +179,6 @@ STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-DEFAULT_RENDERER_CLASSES = 'rest_framework.renderers.JSONRenderer'
-
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
@@ -190,9 +188,20 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_RENDERER_CLASSES": [
-    'rest_framework.renderers.BrowsableAPIRenderer' if DEBUG else DEFAULT_RENDERER_CLASSES,
-    ]
+        "rest_framework.renderers.JSONRenderer",
+    ],
 }
+
+if DEBUG:
+    REST_FRAMEWORK.update(
+        {
+            "DEFAULT_RENDERER_CLASSES": [
+                "rest_framework.renderers.JSONRenderer",
+                "rest_framework.renderers.BrowsableAPIRenderer",
+            ]
+        }
+    )
+
 
 AUTH_USER_MODEL = "core.User"
 
