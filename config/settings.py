@@ -186,7 +186,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 20,
+    "PAGE_SIZE": 30,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
