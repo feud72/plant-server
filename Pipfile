@@ -16,6 +16,9 @@ django-cors-headers = "*"
 drf-nested-routers = "*"
 pymysql = "*"
 gunicorn = "*"
+djangorestframework-simplejwt = "*"
+django-allauth = "*"
+dj-rest-auth = "*"
 
 [dev-packages]
 black = "*"
