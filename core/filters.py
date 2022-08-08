@@ -24,7 +24,7 @@ class GenusFilter(filters.FilterSet):
 
 
 class SpeciesFilter(filters.FilterSet):
-    family = filters.CharFilter(field_name="genus__family", lookup_expr="exact")
+    family = filters.NumberFilter(field_name="genus__family", lookup_expr="exact")
     genus = filters.NumberFilter(field_name="genus", lookup_expr="exact")
     query = filters.CharFilter(field_name="name_kor", lookup_expr="icontains")
 
@@ -37,7 +37,9 @@ class PhotoFilter(filters.FilterSet):
     species = filters.CharFilter(
         field_name="species__name_kor", lookup_expr="icontains"
     )
+    family = filters.NumberFilter(field_name="family", lookup_expr="exact")
+    genus = filters.NumberFilter(field_name="genus", lookup_expr="exact")
 
     class Meta:
         model = Photo
-        fields = ["species"]
+        fields = ["family", "genus", "species"]
