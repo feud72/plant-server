@@ -2,11 +2,9 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from taxonomy.models import Genus, Species
+from taxonomy.models import Family, Genus, Species
 
 from .models import Photo
-
-from taxonomy.models import Family
 
 User = get_user_model()
 
@@ -64,8 +62,6 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class PhotoTaxonomyRelatedSerializer(serializers.ModelSerializer):
-    # part = serializers.CharField(source="get_part_display")
-
     class Meta:
         model = Photo
         fields = (
@@ -75,9 +71,20 @@ class PhotoTaxonomyRelatedSerializer(serializers.ModelSerializer):
         )
 
 
+class PhotoQuizeRelatedSerializer(serializers.ModelSerializer):
+    species = SpeciesSerializer()
+
+    class Meta:
+        model = Photo
+        fields = (
+            "species",
+            "url",
+            "thumbnail",
+        )
+
+
 class FilteredThumbnailSerializer(serializers.ListSerializer):
     def to_representation(self, data):
-        # data = data.all().first()
         return super(FilteredThumbnailSerializer, self).to_representation(data)
 
 

@@ -4,13 +4,10 @@ from .models import Photo
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
-    # list_display = (
-    #     "species",
-    #     "thumbnail",
-    # )
-    # readonly_fields = ("uploaded_at",)
-
-    # @admin.display(description="종")
-    # def species(self, obj: Photo):
-    #     return "%s" % (obj.plant.name_kor)
-    pass
+    list_display = (
+        "__str__",
+        "thumbnail",
+        "uploaded_at",
+    )
+    readonly_fields = ("uploaded_at",)
+    search_fields = ["species__name_kor"]

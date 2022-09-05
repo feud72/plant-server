@@ -86,11 +86,11 @@ class Photo(models.Model):
         ordering = ["-uploaded_at"]
 
     def __str__(self) -> str:
-        if self.plant:
-            if self.plant.name_kor:
-                return self.plant.name_kor
-            elif self.plant.name:
-                return self.plant.name
+        if self.species:
+            if self.species.name_kor:
+                return self.species.name_kor
+            elif self.species.name:
+                return self.species.name
         return f"미분류 #{str(self.id)}"
 
     def delete(self, *args, **kwargs):
