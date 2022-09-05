@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
             {
                 "classes": ("wide",),
                 "fields": (
-                    "username",
+                    # "username",
                     "password1",
                     "password2",
                     "email",
@@ -22,3 +22,6 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+    readonly_fields = ("username",)
+
+    # exclude = ("username",)
