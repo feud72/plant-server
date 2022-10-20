@@ -2,42 +2,29 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from taxonomy.models import Family, Genus, Species
-
 from .models import Photo
 
+from taxonomy.serializers import (
+    FamilySimpleSerializer,
+    GenusSimpleSerializer,
+    SpeciesSimpleSerializer,
+)
+
+
 User = get_user_model()
-
-
-class FamilySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Family
-        fields = ("id", "name", "name_kor")
-
-
-class GenusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genus
-        fields = ("id", "name", "name_kor")
-
-
-class SpeciesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Species
-        fields = ("id", "name", "name_kor")
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("id", "username")
+        fields = ("id", "nickname", "username")
 
 
 class PhotoSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
-    family = FamilySerializer()
-    genus = GenusSerializer()
-    species = SpeciesSerializer()
+    family = FamilySimpleSerializer()
+    genus = GenusSimpleSerializer()
+    species = SpeciesSimpleSerializer()
     url = serializers.ImageField(use_url=True)
     thumbnail = serializers.ImageField(use_url=True)
 
@@ -61,18 +48,8 @@ class PhotoSerializer(serializers.ModelSerializer):
         )
 
 
-class PhotoTaxonomyRelatedSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Photo
-        fields = (
-            "id",
-            "url",
-            "thumbnail",
-        )
-
-
 class PhotoQuizeRelatedSerializer(serializers.ModelSerializer):
-    species = SpeciesSerializer()
+    species = SpeciesSimpleSerializer()
 
     class Meta:
         model = Photo

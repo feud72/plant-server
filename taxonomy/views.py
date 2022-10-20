@@ -1,5 +1,9 @@
-from django.db.models import F
+import re
+
+from django.db.models import F, Count
+
 from rest_framework.viewsets import ModelViewSet
+
 from django_filters import rest_framework as filters
 
 from .models import Family, Genus, Species
@@ -8,62 +12,72 @@ from .serializers import (
     GenusSerializer,
     SpeciesSerializer,
 )
+from .paginations import FamilyPagination
 
-from core.filters import FamilyFilter, GenusFilter, SpeciesFilter
+from core.filters import GenusFilter, SpeciesFilter
 
 
 class FamilyViewSet(ModelViewSet):
-    queryset = (
-        Family.objects.prefetch_related("genera").prefetch_related("photos").distinct()
-    )
     serializer_class = FamilySerializer
     http_method_names = ["get"]
-    pagination_class = None
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_class = FamilyFilter
+    pagination_class = FamilyPagination
 
-    def get_serializer_context(self):
-        context = {
-            "request": self.request,
-            "format": self.format_kwarg,
-            "view": self,
-        }
-        query = self.request.query_params.get("query")
-        if query != None:
-            context.update({"query": query})
-        return context
+    def get_queryset(self):
+        queryset = (
+            Family.objects.prefetch_related("genera")
+            .prefetch_related("genera__species")
+            .prefetch_related("photos")
+            .order_by(F("name_kor").asc(nulls_last=True))
+        )
+        query = self.request.query_params.get("query", None)
+        if query != None and query != "":
+            reg = re.compile(r"[a-zA-Z]")
+            if reg.match(query):
+                queryset = queryset.filter(genera__species__name__icontains=query)
+            else:
+                queryset = queryset.filter(genera__species__name_kor__icontains=query)
+        return queryset.annotate(count=Count("genera__species", distinct=True))
 
 
 class GenusViewSet(ModelViewSet):
-    queryset = (
-        Genus.objects.prefetch_related("species")
-        .prefetch_related("photos")
-        .distinct()
-        .order_by(F("name_kor").asc(nulls_last=True))
-    )
     serializer_class = GenusSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = GenusFilter
 
-    def get_serializer_context(self):
-        context = {
-            "request": self.request,
-            "format": self.format_kwarg,
-            "view": self,
-        }
+    def get_queryset(self):
+        queryset = Genus.objects.prefetch_related("photos").order_by(
+            F("name_kor").asc(nulls_last=True)
+        )
         query = self.request.query_params.get("query")
-        if query != None:
-            context.update({"query": query})
-        return context
+        if query != None and query != "":
+            reg = re.compile(r"[a-zA-Z]")
+            if reg.match(query):
+                queryset = queryset.filter(species__name__icontains=query)
+            else:
+                queryset = queryset.filter(species__name_kor__icontains=query)
+        return queryset.annotate(count=Count("species", distinct=True))
 
 
 class SpeciesViewSet(ModelViewSet):
     queryset = (
         Species.objects.all()
-        .select_related("genus")
-        .select_related("genus__family")
+        .prefetch_related("genus")
+        .prefetch_related("genus__family")
         .prefetch_related("photos")
+        .order_by(F("name_kor").asc(nulls_last=True))
+        .distinct()
     )
     serializer_class = SpeciesSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = SpeciesFilter
+
+    def get_queryset(self):
+        queryset = self.queryset
+        query = self.request.query_params.get("query")
+        if query != None and query != "":
+            reg = re.compile(r"[a-zA-Z]")
+            if reg.match(query):
+                queryset = queryset.filter(name__icontains=query)
+            else:
+                queryset = queryset.filter(name_kor__icontains=query)
+        return queryset.annotate(count=Count("id", distinct=True))

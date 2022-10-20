@@ -9,8 +9,8 @@ from .views import (
 
 router = routers.DefaultRouter()
 router.register("families", FamilyViewSet, basename="family")
-router.register("genera", GenusViewSet)
-router.register("species", SpeciesViewSet)
+router.register("genera", GenusViewSet, basename="genera")
+router.register("species", SpeciesViewSet, basename="species")
 
 urlpatterns = [
     path("", include(router.urls)),
